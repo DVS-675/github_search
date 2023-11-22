@@ -13,7 +13,6 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-
 }
 
 .main__title {
@@ -79,13 +78,13 @@
   margin-bottom: 10px;
   display: flex;
   flex-direction: row;
-  gap:10px;
+  gap: 10px;
   justify-content: end;
   align-items: center;
-  cursor:pointer;
+  cursor: pointer;
 }
 
-.search_sort_select{
+.search_sort_select {
   height: 15px;
   width: 15px;
   rotate: 90deg;
@@ -94,10 +93,10 @@
   transition: all;
   transition-duration: 0.2s;
 }
-.search_sort_select_rev{
+.search_sort_select_rev {
   height: 15px;
   width: 15px;
-  rotate:270deg;
+  rotate: 270deg;
   stroke: black;
   fill: black;
   transition: all;
@@ -131,7 +130,7 @@
   align-items: center;
   justify-content: start;
   flex-direction: column;
-  gap:10px;
+  gap: 10px;
   padding: 20px 20px;
   border-radius: 10px;
   -webkit-box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);

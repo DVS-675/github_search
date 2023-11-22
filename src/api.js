@@ -8,9 +8,9 @@ export function getUser(login, page) {
     `https://api.github.com/search/users?q=${login}&per_page=${userPerPage}&page=${page}`,
     {
       method: "GET",
-        headers: {
-            Authorization: token,
-        },
+        // headers: {
+        //     Authorization: token,
+        // },
     }
   ).then((response) => {
     return response.json();
@@ -19,12 +19,12 @@ export function getUser(login, page) {
 
 export function getUserRepos(login) {
     return fetch(
-        `https://api.github.com/users/${login}/repos?&per_page=100`,
+        `https://api.github.com/users/${login}/repos?&per_page=300`,
         {
             method: "GET",
-            headers: {
-               Authorization: token,
-            },
+            // headers: {
+            //    Authorization: token,
+            // },
         }
     ).then((response) => {
         return response.json();
