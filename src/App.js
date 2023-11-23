@@ -4,23 +4,22 @@ import { getUser, getUserRepos } from "./api";
 
 function App() {
   const [login, setLogin] = useState("");
-  const [users, setUsers] = useState(null);
+  const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState(false);
-  const [clicked, setClicked] = useState(false);
+  const [newUsers, setNewUsers] = useState([]);
   const [clickedCard, setClickedCard] = useState();
+  const [searchQuery, setSearchQuery] = useState(1)
 
   const incrementPage = () => {
     setPage((prev) => prev + 1);
+    setSearchQuery(prev => prev + 1)
   };
 
   const handleSearch = async () => {
     const responseData = await getUser(login, page);
-    setUsers(
-      responseData.items.map((user) => {
-        return { ...user, repositories: [] };
-      })
-    );
+    setUsers(responseData.items)
+    setSearchQuery(prev => prev + 1)
   };
 
   const handleSort = () => {
@@ -48,26 +47,19 @@ function App() {
   };
 
   useEffect(() => {
-    if (users) {
-      let usersNew = users.filter((user) => user.repositories.length === 0);
-
-      let requests = users.map((user) => getUserRepos(user.login));
-      Promise.all(requests).then((responses) =>
-        responses.forEach((response) => {
-          response.map((repo) => {
-            users.map((user) => {
-              if (user.login === repo.owner.login) {
-                user.repositories.push(repo);
-              }
-            });
-          });
-        })
+    if (!users) return
+    let currentUserArr = newUsers.length === 0 ? [...users] : [...newUsers]
+    if (currentUserArr.length) {
+      let requests = currentUserArr.map((user) => getUserRepos(user));
+      Promise.all(requests).then((responses) => {
+            setUsers(responses)
+          }
       );
     }
-  }, [users]);
+  }, [searchQuery]);
 
   useEffect(() => {
-    if (users) {
+    if (users.length) {
       getUser(login, page).then((res) => {
         setUsers([
           ...users,
@@ -75,11 +67,11 @@ function App() {
             return { ...user, repositories: [] };
           }),
         ]);
+        setSearchQuery(prev => prev + 1)
       });
     }
   }, [page]);
 
-  console.log(users);
 
   return (
     <div className="App">
@@ -105,7 +97,7 @@ function App() {
           />
         </div>
         <div className="box">
-          {users && users.length ? (
+          {users ? (
             users.map((item, i) => (
               <div>
                 {clickedCard !== i ? (
@@ -115,9 +107,9 @@ function App() {
                       src={item.avatar_url}
                       alt="avatar"
                     />
-                    {item.repositories.length !== 0 && (
+                    {item.repositories?.length !== 0 && (
                       <div className="box__title">
-                        {item.repositories.length}
+                        {item.repositories?.length}
                       </div>
                     )}
 
@@ -126,14 +118,14 @@ function App() {
                 ) : (
                   <div onClick={() => handleCardClick(i)} className="box__user">
                     <div className="box__user_login">{item.login}</div>
-                    {item.repositories.length !== 0 && (
+                    {item.repositories?.length !== 0 && (
                       <div className="box__title">
-                        {`number of repos: ${item.repositories.length}`}
+                        {`number of repos: ${item.repositories?.length}`}
                       </div>
                     )}
                   </div>
                 )}
-                ;
+
               </div>
             ))
           ) : (

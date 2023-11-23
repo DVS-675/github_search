@@ -8,43 +8,31 @@ export function getUser(login, page) {
     `https://api.github.com/search/users?q=${login}&per_page=${userPerPage}&page=${page}`,
     {
       method: "GET",
-        // headers: {
-        //     Authorization: token,
-        // },
+        headers: {
+            Authorization: token,
+        },
     }
   ).then((response) => {
     return response.json();
   });
 }
 
-export function getUserRepos(login) {
+export function getUserRepos(user) {
     return fetch(
-        `https://api.github.com/users/${login}/repos?&per_page=300`,
+        `https://api.github.com/users/${user.login}/repos?&per_page=300`,
         {
             method: "GET",
-            // headers: {
-            //    Authorization: token,
-            // },
+            headers: {
+               Authorization: token,
+            },
         }
     ).then((response) => {
         return response.json();
-    });
+    }).then(res => {
+        let newUser
+        newUser = {...user, repositories: res }
+        return newUser
+    })
 }
 
 
-//  для информации о пользователе ${BASE_PATH}users/${userName}`
-// export function getUserNew(login) {
-//     return fetch(
-//         `${API_PATH}?q=` +
-//         encodeURIComponent(`${login} in:login sort:repositories`) +
-//         "&per_page=100",
-//         {
-//             headers: {
-//                 Authorization: token,
-//             },
-//         }
-//     ).then((response) => {
-//         console.log(response);
-//         return response.json();
-//     });
-// }
