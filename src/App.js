@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { getUser, getUserRepos } from "./api";
+import { ThreeDots } from "react-loader-spinner";
+import { Link } from "react-router-dom";
 
 function App() {
   const [login, setLogin] = useState("");
@@ -9,17 +11,18 @@ function App() {
   const [sort, setSort] = useState(false);
   const [newUsers, setNewUsers] = useState([]);
   const [clickedCard, setClickedCard] = useState();
-  const [searchQuery, setSearchQuery] = useState(1)
+  const [searchQuery, setSearchQuery] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const incrementPage = () => {
     setPage((prev) => prev + 1);
-    setSearchQuery(prev => prev + 1)
+    setSearchQuery((prev) => prev + 1);
   };
 
   const handleSearch = async () => {
     const responseData = await getUser(login, page);
-    setUsers(responseData.items)
-    setSearchQuery(prev => prev + 1)
+    setUsers(responseData.items);
+    setSearchQuery((prev) => prev + 1);
   };
 
   const handleSort = () => {
@@ -47,14 +50,15 @@ function App() {
   };
 
   useEffect(() => {
-    if (!users) return
-    let currentUserArr = newUsers.length === 0 ? [...users] : [...newUsers]
+    if (!users) return;
+    setIsLoading(true);
+    let currentUserArr = newUsers.length === 0 ? [...users] : [...newUsers];
     if (currentUserArr.length) {
       let requests = currentUserArr.map((user) => getUserRepos(user));
       Promise.all(requests).then((responses) => {
-            setUsers(responses)
-          }
-      );
+        setUsers(responses);
+        setIsLoading(false);
+      });
     }
   }, [searchQuery]);
 
@@ -67,11 +71,12 @@ function App() {
             return { ...user, repositories: [] };
           }),
         ]);
-        setSearchQuery(prev => prev + 1)
+        setSearchQuery((prev) => prev + 1);
       });
     }
   }, [page]);
 
+  console.log(users);
 
   return (
     <div className="App">
@@ -107,25 +112,52 @@ function App() {
                       src={item.avatar_url}
                       alt="avatar"
                     />
-                    {item.repositories?.length !== 0 && (
-                      <div className="box__title">
-                        {item.repositories?.length}
-                      </div>
-                    )}
 
-                    <div className="box__user_login">{item.login}</div>
+                    {isLoading ? (
+                      <ThreeDots
+                        height="30"
+                        width="30"
+                        radius="9"
+                        color="#005b96"
+                        ariaLabel="three-dots-loading"
+                        wrapperStyle={{}}
+                        wrapperClassName=""
+                        visible={true}
+                      />
+                    ) : (
+                      <div className="box__user_login">{item.login}</div>
+                      // <div>
+                      //   {item.repositories?.length !== 0 && (
+                      //     <div className="box__title">
+                      //       {item.repositories?.length}
+                      //     </div>
+                      //   )}
+                      // </div>
+                    )}
                   </div>
                 ) : (
                   <div onClick={() => handleCardClick(i)} className="box__user">
-                    <div className="box__user_login">{item.login}</div>
+                    <div className="box__user_login">
+                      {item.login}
+                      </div>
                     {item.repositories?.length !== 0 && (
-                      <div className="box__title">
-                        {`number of repos: ${item.repositories?.length}`}
+                      <div className='box__user_content'>
+                        <div className="box__title">
+                          {`number of repos: ${item.repositories?.length}`}
+                        </div>
+
+                        <Link
+                          target="_blank"
+                          onClick={(e) => e.stopPropagation()}
+                          to={item.html_url}
+                          className="box__link"
+                        >
+                          Profile link
+                        </Link>
                       </div>
                     )}
                   </div>
                 )}
-
               </div>
             ))
           ) : (
